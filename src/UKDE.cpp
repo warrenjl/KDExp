@@ -104,7 +104,6 @@ arma::vec w(n); w.fill(0.00);
 arma::vec gamma = y;
 if(likelihood_indicator == 2){
   
-  //w Update
   Rcpp::List w_output = w_update(y,
                                  x,
                                  off_set,
