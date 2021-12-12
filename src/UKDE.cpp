@@ -45,7 +45,7 @@ if(a_r_prior.isNotNull()){
   a_r = Rcpp::as<int>(a_r_prior);
   }
 
-int b_r = 50;
+int b_r = 100;
 if(b_r_prior.isNotNull()){
   b_r = Rcpp::as<int>(b_r_prior);
   }
@@ -102,35 +102,24 @@ neg_two_loglike(0) = neg_two_loglike_update(y,
 //Main Sampling Loop
 arma::vec w(n); w.fill(0.00);
 arma::vec gamma = y;
-for(int j = 1; j < mcmc_samples; ++j){
+if(likelihood_indicator == 2){
   
-   if(likelihood_indicator == 2){
-    
-     //r Update
-     r(j) = r_update(y,
-                     x,
-                     off_set,
-                     n,
-                     a_r,
-                     b_r,
-                     beta.col(j-1),
-                     theta(j-1),
-                     z);
-    
-     //w Update
-     Rcpp::List w_output = w_update(y,
-                                    x,
-                                    off_set,
-                                    likelihood_indicator,
-                                    n,
-                                    r(j),
-                                    beta.col(j-1),
-                                    theta(j-1),
-                                    z);
-     w = Rcpp::as<arma::vec>(w_output[0]);
-     gamma = Rcpp::as<arma::vec>(w_output[1]);
-    
-     }
+  //w Update
+  Rcpp::List w_output = w_update(y,
+                                 x,
+                                 off_set,
+                                 likelihood_indicator,
+                                 n,
+                                 r(0),
+                                 beta.col(0),
+                                 theta(0),
+                                 z);
+  w = Rcpp::as<arma::vec>(w_output[0]);
+  gamma = Rcpp::as<arma::vec>(w_output[1]);
+  
+  }
+
+for(int j = 1; j < mcmc_samples; ++j){
    
    if(likelihood_indicator == 1){
   
@@ -155,7 +144,7 @@ for(int j = 1; j < mcmc_samples; ++j){
                                     off_set,
                                     likelihood_indicator,
                                     n,
-                                    r(j),
+                                    r(j-1),
                                     beta.col(j-1),
                                     theta(j-1),
                                     z);
@@ -188,6 +177,34 @@ for(int j = 1; j < mcmc_samples; ++j){
                      gamma,
                      beta.col(j),
                      theta(j));
+   
+   if(likelihood_indicator == 2){
+     
+     //r Update
+     r(j) = r_update(y,
+                     x,
+                     off_set,
+                     n,
+                     a_r,
+                     b_r,
+                     beta.col(j),
+                     theta(j),
+                     z);
+     
+     //w Update
+     Rcpp::List w_output = w_update(y,
+                                    x,
+                                    off_set,
+                                    likelihood_indicator,
+                                    n,
+                                    r(j),
+                                    beta.col(j),
+                                    theta(j),
+                                    z);
+     w = Rcpp::as<arma::vec>(w_output[0]);
+     gamma = Rcpp::as<arma::vec>(w_output[1]);
+     
+     }
 
    //neg_two_loglike Update
    neg_two_loglike(j) = neg_two_loglike_update(y,
@@ -216,10 +233,10 @@ for(int j = 1; j < mcmc_samples; ++j){
   
    }
                                   
-return Rcpp::List::create(Rcpp::Named("r") = r,
-                          Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
+return Rcpp::List::create(Rcpp::Named("sigma2_epsilon") = sigma2_epsilon,
                           Rcpp::Named("beta") = beta,
                           Rcpp::Named("theta") = theta,
+                          Rcpp::Named("r") = r,
                           Rcpp::Named("neg_two_loglike") = neg_two_loglike);
 
 }
