@@ -1,0 +1,60 @@
+---
+output:
+  pdf_document: default
+  word_document: default
+  html_document: default
+---
+# KDExp: Kernel Density Estimation Prior Distribution for Exposure Uncertainty Propagation
+
+## Statistical Model
+\begin{align*}\begin{split}
+    &Y_i|\mu_i, \boldsymbol{\zeta} \stackrel{\text{ind}}{\sim} f\left(y|\mu_i,\boldsymbol{\zeta}\right),\ i=1,\hdots,n,\\
+    &g\left(\mu_i\right) = \text{O}_i + \textbf{x}_i^{\text{T}}\boldsymbol{\beta} + \text{z}_i \theta
+\end{split}\end{align*}
+
+## Likelihood Options
+
+* Gaussian likelihood with identity link function: $Y_i|\boldsymbol{\beta}, \theta, \sigma^2_{\epsilon} \stackrel{\text{ind}}{\sim} \text{N}\left(\textbf{x}_i^{\text{T}}\boldsymbol{\beta} + \text{z}_i \theta, \sigma^2_{\epsilon}\right)$ 
+
+* Bernoulli likelihood with logit link function: $Y_i|\boldsymbol{\beta}, \theta \stackrel{\text{ind}}{\sim} \text{Bernoulli}\left(p_i\right);\ \text{logit}\left(p_i\right) = \textbf{x}_i^{\text{T}}\boldsymbol{\beta} + \text{z}_i \theta$ 
+
+* Negative binomial likelihood with logit link function: $Y_i|\boldsymbol{\beta}, \theta \stackrel{\text{ind}}{\sim} \text{Negative Binomial}\left(r, p_i\right);\ \text{logit}\left(p_i\right) = \text{O}_i + \textbf{x}_i^{\text{T}}\boldsymbol{\beta} + \text{z}_i \theta$ 
+
+## Kernel Density Estimation Prior Distributions
+
+* UKDE:
+
+\begin{equation*}f\left(\text{z}_i\right) = \frac{1}{m} \sum_{j=1}^m \frac{1}{\sqrt{2 \pi h_i^2}} \exp\left\{-\frac{1}{2h_i^2} \left(\text{z}_i - \text{z}_{ij}^*\right)^2\right\},\ i=1,...,n\end{equation*}
+
+* MKDE:
+
+\begin{equation*}f\left(\textbf{z}\right) = \frac{1}{m} \sum_{j=1}^m \frac{1}{\sqrt{\left(2 \pi\right)^n |H|}} \exp\left\{-\frac{1}{2} \left(\textbf{z} - \textbf{z}_{.j}^*\right)^{\text{T}} H^{-1} \left(\textbf{z} - \textbf{z}_{.j}^*\right)\right\}\end{equation*}
+
+## Prior Information
+$\beta_j, \theta \stackrel{\text{iid}}{\sim}\text{N}\left(0, \sigma^2_{r}\right),\ j=1,...,p;$
+
+* $p$: Length of $\textbf{x}_i$ vector (same for all $i$);
+
+* Default setting: $\sigma^2_{r} = 10,000.$
+
+$\sigma^2_{\epsilon} \sim \text{Inverse Gamma}\left(a_{\sigma^2_{\epsilon}}, b_{\sigma^2_{\epsilon}}\right);$
+
+* Default setting: $a_{\sigma^2_{\theta}} = 0.01$, $b_{\sigma^2_{\theta}} = 0.01.$
+
+$r \sim \text{Discrete Uniform}\left[a_{r}, b_{r}\right];$
+
+* Default setting: $a_{r} = 1$, $b_{r} = 100.$
+
+## Default Initial Values
+* $\beta_j = \theta = 0$ for all $j$;
+
+* $\sigma^2_{\epsilon} = \text{variance}\left(\boldsymbol{Y}\right)$;
+
+* $r = 100$.
+
+## Likelihood Indicator
+* likelihood_indicator $= 0$: Bernoulli; 
+
+* likelihood_indicator $= 1$: Gaussian;
+
+* likelihood_indicator $= 2$: Negative binomial.

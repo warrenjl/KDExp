@@ -25,8 +25,8 @@ arma::vec temp(m); temp.fill(0.00);
 for(int k = 0; k < m; ++k){
    
    piece = theta*(w%(gamma - off_set - x*beta)) + 
-           H_inv*trans(z_ppd.row(k));
-   log_c.col(k) = -0.50*z_ppd.row(k)*(H_inv*trans(z_ppd.row(k))) +
+           H_inv*z_ppd.col(k);
+   log_c.col(k) = -0.50*trans(z_ppd.col(k))*(H_inv*z_ppd.col(k)) +
                    0.50*trans(piece)*(cov_z*piece);
    temp(k) = log_c(0,k);
       
@@ -43,7 +43,7 @@ double index = sampleRcpp(wrap(sample_set),
                           TRUE, 
                           wrap(probs))(0);
 
-arma::vec mu_z = cov_z*(theta*(w%(gamma - off_set - x*beta)) + H_inv*trans(z_ppd.row(index)));
+arma::vec mu_z = cov_z*(theta*(w%(gamma - off_set - x*beta)) + H_inv*z_ppd.col(index));
    
 arma::mat ind_norms = arma::randn(1,n);
 arma::vec z = mu_z + 

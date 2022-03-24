@@ -25,8 +25,8 @@ Rcpp::List MKDE(int mcmc_samples,
 
 //Defining Parameters and Quantities of Interest
 int p_x = x.n_cols;
-int n = z_ppd.n_cols;
-int m = z_ppd.n_rows;
+int m = z_ppd.n_cols;
+int n = z_ppd.n_rows;
 arma::mat H_inv = inv_sympd(H);
 
 arma::vec r(mcmc_samples); r.fill(0.00);
@@ -88,7 +88,7 @@ if(theta_init.isNotNull()){
   theta(0) = Rcpp::as<double>(theta_init);
   }
 
-z = trans(z_ppd.row(0));
+z = z_ppd.col(0);
 
 neg_two_loglike(0) = neg_two_loglike_update(y,
                                             x,

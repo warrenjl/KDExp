@@ -20,8 +20,8 @@ arma::vec z_UKDE_update(arma::mat x,
 arma::vec var_z = pow(h,2)/(pow(theta,2)*(pow(h,2))%w + 1.00);
 arma::mat log_c(m,n); log_c.fill(0.00);
 for(int k = 0; k < m; ++k){
-   log_c.row(k) = trans(-0.50*(pow((gamma - off_set - x*beta),2)%pow(h,2)%w + pow(trans(z_ppd.row(k)),2))/pow(h,2) +
-                         0.50*(pow(theta*(gamma - off_set - x*beta)%pow(h,2)%w + trans(z_ppd.row(k)),2))/(pow(h,2)%(pow(theta,2)*(pow(h,2)%w) + 1.00)));
+   log_c.row(k) = trans(-0.50*(pow((gamma - off_set - x*beta),2)%pow(h,2)%w + pow(z_ppd.col(k),2))/pow(h,2) +
+                         0.50*(pow(theta*(gamma - off_set - x*beta)%pow(h,2)%w + z_ppd.col(k),2))/(pow(h,2)%(pow(theta,2)*(pow(h,2)%w) + 1.00)));
    }
 
 //arma::mat temp_mat(m,n); temp_mat.fill(0.00);  
@@ -50,7 +50,7 @@ for(int k = 0; k < n; ++k){
                       TRUE, 
                       wrap(probs.col(k)))(0);
       
-   mu_z = (theta*(gamma(k) - mu_temp(k))*pow(h(k),2)*w(k) + z_ppd(index, k))/(pow(theta,2)*pow(h(k),2)*w(k) + 1.00);
+   mu_z = (theta*(gamma(k) - mu_temp(k))*pow(h(k),2)*w(k) + z_ppd(k, index))/(pow(theta,2)*pow(h(k),2)*w(k) + 1.00);
 
    z(k) = R::rnorm(mu_z, 
                    sqrt(var_z(k)));  
