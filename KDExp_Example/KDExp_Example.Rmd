@@ -11,7 +11,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## KDExp_Example
 
-[1] Load the simulated data: 
+[1] Load the simulated data:  See Table 1 of the Manuscript
+
+* Associated: Yes
+
+* Correlated: Yes
+
+* Skewed: No
+
+* $\delta_i$ Variance: Low
+
 ```{r}
 set.seed(8453)
 
@@ -75,5 +84,8 @@ results_mkde<-MKDE(mcmc_samples = mcmc_samples,
 ```{r echo=TRUE}
 plot(results_ukde$theta[keep_set,1], type="l")
 lines(results_mkde$theta[keep_set,1], col = "red")
+abline(h = 1.00,  #Truth
+       col = "blue",
+       lwd = 2)
 ```
 

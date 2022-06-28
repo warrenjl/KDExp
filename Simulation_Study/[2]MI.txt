@@ -1,0 +1,113 @@
+separate_fun<-function(sim_data,       #List from the "sim_data_fun" function
+                       mcmc_samples){  #Number of independent posterior samples to collect from each of the m models
+
+##############################################
+#Statistical Model:
+##############################################
+#Y_i ~ N(\beta0 + \beta1*z_i, \sigma2_epsilon)
+#\beta0, \beta1 ~ flat prior
+#\sigma2_epsilon ~ Inverse Gamma(0.01, 0.01)
+##############################################
+
+###################
+#Package
+###################
+library(mnormt)
+library(HDInterval)
+
+###############
+#Seed
+###############
+set.seed(18984)
+
+###################################################################
+#Model Fitting
+###################################################################
+sim_count<-length(sim_data)
+m<-nrow(sim_data[[1]]$z_ppd)
+n<-length(sim_data[[1]]$y)
+inference<-list(0)
+for(sim_counter in 1:sim_count){
+
+   #Exposures and outcome
+   z_ppd<-sim_data[[sim_counter]]$z_ppd
+   y<-sim_data[[sim_counter]]$y
+
+   #Parameters
+   beta<-array(0.00,
+               dim = c(m, 
+                       mcmc_samples, 
+                       2))
+   sigma2_epsilon<-matrix(0.00,
+                          nrow = m,
+                          ncol = mcmc_samples)
+
+   for(j in 1:m){
+
+      #Exposure
+      x<-cbind(1,
+               z_ppd[j,])
+      xtx_inv<-chol2inv(chol(crossprod(x)))
+      px<-tcrossprod((x%*%xtx_inv),
+                     x)
+
+      #sigma2_epsilon Update
+      shape_update<-0.01 +
+                    (n - ncol(x))/2.00
+
+      rate_update<-0.01 +
+                   crossprod(y, ((diag(n) - px)%*%y))/2.00
+
+      sigma2_epsilon[j,]<-1.00/rgamma(n = mcmc_samples,
+                                      shape = shape_update,
+                                      rate = rate_update)
+
+      #beta Update
+      mu_beta<-xtx_inv%*%crossprod(x, y)
+
+      for(k in 1:mcmc_samples){
+         beta[j,k,]<-rmnorm(n = 1,
+                            mean = mu_beta,
+                            varcov = (sigma2_epsilon[j,k]*xtx_inv))
+         }
+
+      }
+
+   ####################################################
+   #Inference
+   ####################################################
+   mean<-mean(beta[,,2])
+   median<-median(beta[,,2])
+   sd<-sd(beta[,,2])
+   cri<-quantile(beta[,,2],
+                 c(0.025, 0.975))
+   hdi<-hdi(beta[,,2], 
+            credMass = 0.95)
+
+   inference[[sim_counter]]<-list(post_mean = mean,
+                                  post_median = median,
+                                  post_sd = sd,
+                                  cri = cri,
+                                  hdi)
+
+   ############################################
+   #Printing to the Screen
+   ############################################
+   print(round((100*sim_counter/sim_count), 2))
+
+   }
+
+#################
+#Returning Output
+#################
+return(inference)
+
+}
+
+###################################################
+#Calling the Function
+###################################################
+results_separate<-separate_fun(sim_data = sim_data,
+                               mcmc_samples = 1000)
+
+

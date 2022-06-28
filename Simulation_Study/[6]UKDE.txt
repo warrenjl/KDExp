@@ -1,0 +1,85 @@
+##############################################
+#Statistical Model:
+##############################################
+#Y_i ~ N(\beta0 + \beta1*z_i, \sigma2_epsilon)
+#z ~ Gaussian UKDE(z_ppd)
+#\beta0, \beta1 ~ N(0.00, 100.00^2)
+#\sigma2_epsilon ~ Inverse Gamma(0.01, 0.01)
+##############################################
+
+###################
+#Package
+###################
+library(KDExp)
+library(HDInterval)
+
+###############
+#Seed
+###############
+set.seed(96320)
+
+###########################
+#Inference Set
+###########################
+burnin<-1000
+mcmc_samples<-11000
+thin<-10
+keep_set<-seq((burnin + 1),
+              mcmc_samples,
+              thin)
+
+sim_count<-length(sim_data)
+inference<-list(0)
+for(j in 1:sim_count){
+
+   #############################################################################
+   #KDE Bandwidth Estimation
+   #############################################################################
+   h<-rep(0.00,
+          times = length(sim_data[[j]]$y))
+   for(k in 1:length(sim_data[[j]]$y)){
+      h[k]<-bw.SJ(sim_data[[j]]$z_ppd[,k])  #https://aakinshin.net/posts/kde-bw/
+      }
+
+   #############################################################
+   #Model Fitting
+   #############################################################
+   results_ukde<-UKDE(mcmc_samples = mcmc_samples,
+                      y = sim_data[[j]]$y,
+                      x = matrix(1,
+                                 nrow = length(sim_data[[j]]$y),
+                                 ncol = 1), 
+                      z_ppd = t(sim_data[[j]]$z_ppd),
+                      h = h,
+                      likelihood_indicator = 1)
+
+   ############################################
+   #Inference
+   ############################################
+   mean<-mean(results_ukde$theta[keep_set])
+   median<-median(results_ukde$theta[keep_set])
+   sd<-sd(results_ukde$theta[keep_set])
+   cri<-quantile(results_ukde$theta[keep_set],
+                 c(0.025, 0.975))
+   hdi<-hdi(results_ukde$theta[keep_set], 
+            credMass = 0.95)
+
+   inference[[j]]<-list(post_mean = mean,
+                        post_median = median,
+                        post_sd = sd,
+                        cri = cri,
+                        hdi)
+
+   ##################################
+   #Printing to the Screen
+   ##################################
+   print(round((100*j/sim_count), 2))
+   print(mean)
+
+   }
+
+
+
+
+
+

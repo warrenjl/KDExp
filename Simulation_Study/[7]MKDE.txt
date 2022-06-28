@@ -1,0 +1,77 @@
+##############################################
+#Statistical Model:
+##############################################
+#Y_i ~ N(\beta0 + \beta1*z_i, \sigma2_epsilon)
+#z ~ Multivariate Gaussian MKDE(z_ppd)
+#\beta0, \beta1 ~ N(0.00, 100.00^2)
+#\sigma2_epsilon ~ Inverse Gamma(0.01, 0.01)
+##############################################
+
+###############
+#Seed
+###############
+set.seed(58320)
+
+###################
+#Packages
+###################
+library(KDExp)
+library(kernelboot)
+library(HDInterval)
+
+###########################
+#Inference Set
+###########################
+burnin<-1000
+mcmc_samples<-11000
+thin<-10
+keep_set<-seq((burnin + 1),
+              mcmc_samples,
+              thin)
+
+sim_count<-length(sim_data)
+inference<-list(0)
+for(j in 1:sim_count){
+
+   ###################################################################################
+   #KDE Bandwidth Estimation
+   ###################################################################################
+   H<-bw.scott(sim_data[[j]]$z_ppd)  #https://rdrr.io/cran/kernelboot/man/bw.silv.html
+   
+   #############################################################
+   #Model Fitting
+   #############################################################
+   results_mkde<-MKDE(mcmc_samples = mcmc_samples,
+                      y = sim_data[[j]]$y,
+                      x = matrix(1,
+                                 nrow = length(sim_data[[j]]$y),
+                                 ncol = 1), 
+                      z_ppd = t(sim_data[[j]]$z_ppd),
+                      H = H,
+                      likelihood_indicator = 1)
+
+   ############################################
+   #Inference
+   ############################################
+   mean<-mean(results_mkde$theta[keep_set])
+   median<-median(results_mkde$theta[keep_set])
+   sd<-sd(results_mkde$theta[keep_set])
+   cri<-quantile(results_mkde$theta[keep_set],
+                 c(0.025, 0.975))
+   hdi<-hdi(results_mkde$theta[keep_set], 
+            credMass = 0.95)
+
+   inference[[j]]<-list(post_mean = mean,
+                        post_median = median,
+                        post_sd = sd,
+                        cri = cri,
+                        hdi = hdi)
+
+   ##################################
+   #Printing to the Screen
+   ##################################
+   print(round((100*j/sim_count), 2))
+   print(mean)
+
+   }
+

@@ -1,0 +1,136 @@
+du_fun<-function(sim_data,      #List from the "sim_data_fun" function
+                 mcmc_samples,  #Total number of samples to collect (including burnin and thinning)
+                 burnin,        #Number of draws to discard
+                 thin){         #Thinning factor
+
+##############################################
+#Statistical Model:
+##############################################
+#Y_i ~ N(\beta0 + \beta1*z_i, \sigma2_epsilon)
+#z ~ DU(z_ppd1, ..., z_ppdm)
+#\beta0, \beta1 ~ N(0.00, 100.00^2)
+#\sigma2_epsilon ~ Inverse Gamma(0.01, 0.01)
+##############################################
+
+###################
+#Packages
+###################
+library(mnormt)
+library(HDInterval)
+
+################
+#Seed
+################
+set.seed(135842)
+
+########################################################################################
+#Model Fitting
+########################################################################################
+sim_count<-length(sim_data)
+m<-nrow(sim_data[[1]]$z_ppd)
+n<-length(sim_data[[1]]$y)
+inference<-list(0)
+for(sim_counter in 1:sim_count){
+
+   #Exposures and outcome
+   z_ppd<-sim_data[[sim_counter]]$z_ppd
+   y<-sim_data[[sim_counter]]$y
+
+   #Parameters
+   beta<-matrix(0.00,
+                nrow = mcmc_samples,
+                ncol = 2)
+   sigma2_epsilon<-rep(0.00,
+                       times = mcmc_samples)
+
+   #Initial values
+   fit<-lm(y ~ z_ppd[1,])
+   beta[1,]<-fit$coefficients
+   sigma2_epsilon[1]<-summary(fit)$sigma^2
+   x<-cbind(1,
+            z_ppd[1,])
+
+   for(j in 2:mcmc_samples){
+   
+      #Exposure Update
+      x_old<-x
+      second<-sum(dnorm(x = y, 
+                        mean = (x_old%*%beta[(j-1),]),
+                        sd = sqrt(sigma2_epsilon[j-1]),
+                        log = TRUE))
+
+      x<-cbind(1, 
+               z_ppd[sample(c(1:m), size = 1),])
+      first<-sum(dnorm(x = y, 
+                       mean = (x%*%beta[(j-1),]),
+                       sd = sqrt(sigma2_epsilon[j-1]),
+                       log = TRUE))
+
+      ratio<-exp(first - second)
+      uni_draw<-runif(n = 1, 
+                      min = 0.00, 
+                      max = 1.00)      
+
+      if(ratio < uni_draw){
+        x<-x_old
+        }
+
+      #beta Update
+      cov<-chol2inv(chol(crossprod(x)/sigma2_epsilon[j-1] + diag(ncol(x))/(100^2)))
+      mu<-cov%*%crossprod(x, y)/sigma2_epsilon[j-1]
+      beta[j,]<-rmnorm(n = 1,
+                       mean = mu,
+                       varcov = cov)
+
+      #sigma2_epsilon Update
+      sigma2_epsilon[j]<-1.00/rgamma(n = 1,
+                                     shape = ((n/2.00) + 0.01),
+                                     rate = (crossprod((y - x%*%beta[j,]))/2.00 + 0.01))
+
+      }
+
+   ####################################################
+   #Inference
+   ####################################################
+   keep_set<-seq((burnin + 1),
+                 mcmc_samples,
+                 thin)
+   mean<-mean(beta[keep_set, 2])
+   median<-median(beta[keep_set, 2])
+   sd<-sd(beta[keep_set, 2])
+   cri<-quantile(beta[keep_set, 2],
+                 c(0.025, 0.975))
+   hdi<-hdi(beta[keep_set, 2], 
+            credMass = 0.95)
+
+   inference[[sim_counter]]<-list(post_mean = mean,
+                                  post_median = median,
+                                  post_sd = sd,
+                                  cri = cri,
+                                  hdi = hdi)
+
+   ############################################
+   #Printing to the Screen
+   ############################################
+   print(round((100*sim_counter/sim_count), 2))
+
+   }
+
+#################
+#Returning Output
+#################
+return(inference)
+
+}
+
+########################################
+#Calling the Function
+########################################
+results_du<-du_fun(sim_data = sim_data,
+                   mcmc_samples = 11000,
+                   burnin = 1000,
+                   thin = 10)
+
+
+
+

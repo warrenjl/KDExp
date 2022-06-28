@@ -1,0 +1,145 @@
+simple_fun<-function(sim_data,       #List from the "sim_data_fun" function
+                     mcmc_samples){  #Number of independent posterior samples to collect
+
+##############################################
+#Statistical Model:
+##############################################
+#Y_i ~ N(\beta0 + \beta1*z_i, \sigma2_epsilon)
+#\beta0, \beta1 ~ flat prior
+#\sigma2_epsilon ~ Inverse Gamma(0.01, 0.01)
+##############################################
+
+####################
+#Packages
+####################
+library(mnormt)
+library(matrixStats)
+library(HDInterval)
+
+###############
+#Seed
+###############
+set.seed(86851)
+
+###########################################################################
+#Model Fitting
+###########################################################################
+sim_count<-length(sim_data)
+n<-length(sim_data[[1]]$y)
+inference<-list(0)
+for(sim_counter in 1:sim_count){
+
+   #Exposures and outcome
+   z_true<-sim_data[[sim_counter]]$z_true
+   z_ppd<-sim_data[[sim_counter]]$z_ppd
+   y<-sim_data[[sim_counter]]$y
+
+   #Parameters
+   beta_true<-matrix(0.00,
+                     nrow = mcmc_samples, 
+                     ncol = 2)
+   beta_obs<-matrix(0.00,
+                    nrow = mcmc_samples, 
+                    ncol = 2)
+
+   #True exposures
+   x_true<-cbind(1,
+                 z_true)
+
+   #Plug-in approach
+   z_obs<-colMedians(z_ppd)
+   x_obs<-cbind(1,
+                z_obs)
+
+   xtx_inv_true<-chol2inv(chol(crossprod(x_true)))
+   px_true<-tcrossprod((x_true%*%xtx_inv_true),
+                       x_true)
+   xtx_inv_obs<-chol2inv(chol(crossprod(x_obs)))
+   px_obs<-tcrossprod((x_obs%*%xtx_inv_obs),
+                       x_obs)
+
+   #sigma2_epsilon Update
+   shape_update<-0.01 +
+                 (n - ncol(x_true))/2.00
+
+   rate_update_true<-0.01 +
+                     crossprod(y, ((diag(n) - px_true)%*%y))/2.00
+   rate_update_obs<-0.01 +
+                    crossprod(y, ((diag(n) - px_obs)%*%y))/2.00
+   
+   sigma2_epsilon_true<-1.00/rgamma(n = mcmc_samples,
+                                    shape = shape_update,
+                                    rate = rate_update_true)
+   sigma2_epsilon_obs<-1.00/rgamma(n = mcmc_samples,
+                                   shape = shape_update,
+                                   rate = rate_update_obs)
+
+   #beta Update
+   mu_beta_true<-xtx_inv_true%*%crossprod(x_true, y)
+   mu_beta_obs<-xtx_inv_obs%*%crossprod(x_obs, y)
+
+   for(j in 1:mcmc_samples){
+
+      beta_true[j,]<-rmnorm(n = 1,
+                            mean = mu_beta_true,
+                            varcov = (sigma2_epsilon_true[j]*xtx_inv_true))
+      beta_obs[j,]<-rmnorm(n = 1,
+                           mean = mu_beta_obs,
+                           varcov = (sigma2_epsilon_obs[j]*xtx_inv_obs))
+
+      }
+
+   ##############################################################
+   #Inference
+   ##############################################################
+   mean_true<-mean(beta_true[,2])
+   median_true<-median(beta_true[,2])
+   sd_true<-sd(beta_true[,2])
+   cri_true<-quantile(beta_true[,2],
+                      c(0.025, 0.975))
+   hdi_true<-hdi(beta_true[,2], 
+                 credMass = 0.95)
+
+   mean_obs<-mean(beta_obs[,2])
+   median_obs<-median(beta_obs[,2])
+   sd_obs<-sd(beta_obs[,2])
+   cri_obs<-quantile(beta_obs[,2],
+                     c(0.025, 0.975))
+   hdi_obs<-hdi(beta_obs[,2], 
+                credMass = 0.95)
+
+   inference[[sim_counter]]<-list(post_mean_true = mean_true,
+                                  post_median_true = median_true,
+                                  post_sd_true = sd_true,
+                                  cri_true = cri_true,
+                                  hdi_true = hdi_true,
+                                  post_mean_obs = mean_obs,
+                                  post_median_obs = median_obs,
+                                  post_sd_obs = sd_obs,
+                                  cri_obs = cri_obs,
+                                  hdi_obs = hdi_obs)
+
+   ############################################
+   #Printing to the Screen
+   ############################################
+   print(round((100*sim_counter/sim_count), 2))
+   
+   }
+
+#################
+#Returning Output
+#################
+return(inference)
+
+}
+
+###############################################
+#Calling the Function
+###############################################
+results_simple<-simple_fun(sim_data = sim_data,
+                           mcmc_samples = 1000)
+
+
+
+
+
