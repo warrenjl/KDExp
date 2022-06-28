@@ -1,0 +1,202 @@
+sim_data_fun<-function(sim_count,             #Number of datasets to simulate
+                       n,                     #Health analysis sample size
+                       phi_ppd_true,          #Controls spatial correlation in the ppd samples (Inf, -log(0.05))
+                       var_mean_true,         #Controls the spread of the ppd means (0.10, 1.00)
+                       m,                     #Number of independent ppd samples to collect
+                       skewed,                #0: non-skewed; 1: squared; 2: exponential (lognormal)
+                       beta_true,             #True health outcome regression parameters (intercept and slope)
+                       sigma2_epsilon_true){  #True health outcome variance
+
+###############
+#Packages
+###############
+library(mnormt)
+
+#######################################################################################################
+#Seed
+#######################################################################################################
+if((phi_ppd_true == Inf) & (var_mean_true == 0.10) & (skewed == 0) & (beta_true[2] == 0)){
+  set.seed(751)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 0.10) & (skewed == 0) & (beta_true[2] == 1)){
+  set.seed(752)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 0.10) & (skewed == 1) & (beta_true[2] == 0)){
+  set.seed(753)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 0.10) & (skewed == 1) & (beta_true[2] == 1)){
+  set.seed(754)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 0.10) & (skewed == 2) & (beta_true[2] == 0)){
+  set.seed(755)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 0.10) & (skewed == 2) & (beta_true[2] == 1)){
+  set.seed(756)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 1.00) & (skewed == 0) & (beta_true[2] == 0)){
+  set.seed(757)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 1.00) & (skewed == 0) & (beta_true[2] == 1)){
+  set.seed(758)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 1.00) & (skewed == 1) & (beta_true[2] == 0)){
+  set.seed(759)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 1.00) & (skewed == 1) & (beta_true[2] == 1)){
+  set.seed(7510)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 1.00) & (skewed == 2) & (beta_true[2] == 0)){
+  set.seed(7511)
+  }
+if((phi_ppd_true == Inf) & (var_mean_true == 1.00) & (skewed == 2) & (beta_true[2] == 1)){
+  set.seed(7512)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 0.10) & (skewed == 0) & (beta_true[2] == 0)){
+  set.seed(7513)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 0.10) & (skewed == 0) & (beta_true[2] == 1)){
+  set.seed(7514)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 0.10) & (skewed == 1) & (beta_true[2] == 0)){
+  set.seed(7515)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 0.10) & (skewed == 1) & (beta_true[2] == 1)){
+  set.seed(7516)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 0.10) & (skewed == 2) & (beta_true[2] == 0)){
+  set.seed(7517)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 0.10) & (skewed == 2) & (beta_true[2] == 1)){
+  set.seed(7518)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 1.00) & (skewed == 0) & (beta_true[2] == 0)){
+  set.seed(7519)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 1.00) & (skewed == 0) & (beta_true[2] == 1)){
+  set.seed(7520)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 1.00) & (skewed == 1) & (beta_true[2] == 0)){
+  set.seed(7521)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 1.00) & (skewed == 1) & (beta_true[2] == 1)){
+  set.seed(7522)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 1.00) & (skewed == 2) & (beta_true[2] == 0)){
+  set.seed(7523)
+  }
+if((phi_ppd_true == 2.99573227355399) & (var_mean_true == 1.00) & (skewed == 2) & (beta_true[2] == 1)){
+  set.seed(7524)
+  }
+
+####################################################################
+#Simulating Exposure Data
+####################################################################
+sim_data<-list(0)
+for(sim_counter in 1:sim_count){
+
+   #Spatial information
+   locs<-matrix(runif(n = (2*n),
+                      min = 0.00,
+                      max = 1.00),
+                ncol = 2)
+   spatial_dists<-as.matrix(dist(locs,
+                                 diag = TRUE,
+                                 upper = TRUE))
+   diag(spatial_dists)<-0.00
+
+   #ppd means
+   ppd_mean<-rnorm(n = n,
+                   mean = 0.00,
+                   sd = sqrt(var_mean_true))
+
+   #Full set of exposures 
+   Sigma_ppd_true<-exp(-phi_ppd_true*spatial_dists)
+   diag(Sigma_ppd_true)<-1.00
+
+   z_full_raw<-rmnorm(n = (m + 1),
+                      mean = ppd_mean,
+                      varcov = Sigma_ppd_true)
+
+   #Positive exposures only
+   z_full_raw<-z_full_raw -
+               min(z_full_raw)
+
+   #Centering/scaling as in real analysis
+   #Doesn't alter the correlation structure 
+   z_full<-(z_full_raw - mean(z_full_raw))/sd(z_full_raw)
+
+   #Adding skewness
+   if(skewed == 1){
+
+     z_full<-(z_full_raw)^2
+     z_full<-(z_full - mean(z_full))/sd(z_full)
+
+     }
+
+   if(skewed == 2){
+
+     z_full<-exp(z_full_raw)
+     z_full<-(z_full - mean(z_full))/sd(z_full)
+
+     }
+
+   #Plotting of exposure properties
+   par(mfrow = c(2,2))
+   hist(colMeans(z_full))
+   hist(Sigma_ppd_true)
+   hist(z_full)
+   hist(cor(z_full))
+
+   #Setting the true and ppd exposures
+   z_ppd<-z_full[c(1:m),]
+   z_true<-z_full[(m + 1),]
+
+   #Checking coverage of the credible intervals
+   ec<-rep(0,
+           times = n)
+   for(j in 1:n){
+
+      ci<-quantile(z_ppd[,j],
+                   c(0.025, 0.975))
+      ec[j]<-as.numeric((ci[1] <= z_true[j]) & (ci[2] >= z_true[j]))
+
+      }
+   
+   #Simulating health data using the exposures
+   y<-beta_true[1] +
+      beta_true[2]*z_true +
+      rnorm(n = n,
+            mean = 0.00,
+            sd = sqrt(sigma2_epsilon_true))
+
+   sim_data[[sim_counter]]<-list(y = y,
+                                 z_true = z_true,
+                                 z_ppd = z_ppd,
+                                 ec = mean(ec))
+
+   }
+
+#################
+#Returning Output
+#################
+return(sim_data)
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
