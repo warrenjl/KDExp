@@ -12,8 +12,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // MKDE
-Rcpp::List MKDE(int mcmc_samples, arma::vec y, arma::mat x, arma::mat z_ppd, arma::mat H, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_regress_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> theta_init);
-RcppExport SEXP _KDExp_MKDE(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP z_ppdSEXP, SEXP HSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_regress_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP theta_initSEXP) {
+Rcpp::List MKDE(int mcmc_samples, arma::vec y, arma::mat x, arma::mat z_ppd, arma::mat H, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<Rcpp::NumericVector> trials, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_regress_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> theta_init);
+RcppExport SEXP _KDExp_MKDE(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP z_ppdSEXP, SEXP HSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP trialsSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_regress_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP theta_initSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -24,6 +24,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::mat >::type H(HSEXP);
     Rcpp::traits::input_parameter< int >::type likelihood_indicator(likelihood_indicatorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type offset(offsetSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type trials(trialsSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_r_prior(a_r_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type b_r_prior(b_r_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_sigma2_epsilon_prior(a_sigma2_epsilon_priorSEXP);
@@ -33,13 +34,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_epsilon_init(sigma2_epsilon_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type beta_init(beta_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type theta_init(theta_initSEXP);
-    rcpp_result_gen = Rcpp::wrap(MKDE(mcmc_samples, y, x, z_ppd, H, likelihood_indicator, offset, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_regress_prior, r_init, sigma2_epsilon_init, beta_init, theta_init));
+    rcpp_result_gen = Rcpp::wrap(MKDE(mcmc_samples, y, x, z_ppd, H, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_regress_prior, r_init, sigma2_epsilon_init, beta_init, theta_init));
     return rcpp_result_gen;
 END_RCPP
 }
 // UKDE
-Rcpp::List UKDE(int mcmc_samples, arma::vec y, arma::mat x, arma::mat z_ppd, arma::vec h, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_regress_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> theta_init);
-RcppExport SEXP _KDExp_UKDE(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP z_ppdSEXP, SEXP hSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_regress_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP theta_initSEXP) {
+Rcpp::List UKDE(int mcmc_samples, arma::vec y, arma::mat x, arma::mat z_ppd, arma::vec h, int likelihood_indicator, Rcpp::Nullable<Rcpp::NumericVector> offset, Rcpp::Nullable<Rcpp::NumericVector> trials, Rcpp::Nullable<double> a_r_prior, Rcpp::Nullable<double> b_r_prior, Rcpp::Nullable<double> a_sigma2_epsilon_prior, Rcpp::Nullable<double> b_sigma2_epsilon_prior, Rcpp::Nullable<double> sigma2_regress_prior, Rcpp::Nullable<double> r_init, Rcpp::Nullable<double> sigma2_epsilon_init, Rcpp::Nullable<Rcpp::NumericVector> beta_init, Rcpp::Nullable<double> theta_init);
+RcppExport SEXP _KDExp_UKDE(SEXP mcmc_samplesSEXP, SEXP ySEXP, SEXP xSEXP, SEXP z_ppdSEXP, SEXP hSEXP, SEXP likelihood_indicatorSEXP, SEXP offsetSEXP, SEXP trialsSEXP, SEXP a_r_priorSEXP, SEXP b_r_priorSEXP, SEXP a_sigma2_epsilon_priorSEXP, SEXP b_sigma2_epsilon_priorSEXP, SEXP sigma2_regress_priorSEXP, SEXP r_initSEXP, SEXP sigma2_epsilon_initSEXP, SEXP beta_initSEXP, SEXP theta_initSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -50,6 +51,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type h(hSEXP);
     Rcpp::traits::input_parameter< int >::type likelihood_indicator(likelihood_indicatorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type offset(offsetSEXP);
+    Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type trials(trialsSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_r_prior(a_r_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type b_r_prior(b_r_priorSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type a_sigma2_epsilon_prior(a_sigma2_epsilon_priorSEXP);
@@ -59,7 +61,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type sigma2_epsilon_init(sigma2_epsilon_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<Rcpp::NumericVector> >::type beta_init(beta_initSEXP);
     Rcpp::traits::input_parameter< Rcpp::Nullable<double> >::type theta_init(theta_initSEXP);
-    rcpp_result_gen = Rcpp::wrap(UKDE(mcmc_samples, y, x, z_ppd, h, likelihood_indicator, offset, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_regress_prior, r_init, sigma2_epsilon_init, beta_init, theta_init));
+    rcpp_result_gen = Rcpp::wrap(UKDE(mcmc_samples, y, x, z_ppd, h, likelihood_indicator, offset, trials, a_r_prior, b_r_prior, a_sigma2_epsilon_prior, b_sigma2_epsilon_prior, sigma2_regress_prior, r_init, sigma2_epsilon_init, beta_init, theta_init));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -151,21 +153,22 @@ BEGIN_RCPP
 END_RCPP
 }
 // w_update
-Rcpp::List w_update(arma::vec y, arma::mat x, arma::vec off_set, int likelihood_indicator, int n, int r, arma::vec beta_old, double theta_old, arma::vec z_old);
-RcppExport SEXP _KDExp_w_update(SEXP ySEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP likelihood_indicatorSEXP, SEXP nSEXP, SEXP rSEXP, SEXP beta_oldSEXP, SEXP theta_oldSEXP, SEXP z_oldSEXP) {
+Rcpp::List w_update(arma::vec y, arma::mat x, arma::vec off_set, arma::vec tri_als, int likelihood_indicator, int n, int r, arma::vec beta_old, double theta_old, arma::vec z_old);
+RcppExport SEXP _KDExp_w_update(SEXP ySEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP tri_alsSEXP, SEXP likelihood_indicatorSEXP, SEXP nSEXP, SEXP rSEXP, SEXP beta_oldSEXP, SEXP theta_oldSEXP, SEXP z_oldSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type off_set(off_setSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type tri_als(tri_alsSEXP);
     Rcpp::traits::input_parameter< int >::type likelihood_indicator(likelihood_indicatorSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type r(rSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type beta_old(beta_oldSEXP);
     Rcpp::traits::input_parameter< double >::type theta_old(theta_oldSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type z_old(z_oldSEXP);
-    rcpp_result_gen = Rcpp::wrap(w_update(y, x, off_set, likelihood_indicator, n, r, beta_old, theta_old, z_old));
+    rcpp_result_gen = Rcpp::wrap(w_update(y, x, off_set, tri_als, likelihood_indicator, n, r, beta_old, theta_old, z_old));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -211,14 +214,14 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_KDExp_MKDE", (DL_FUNC) &_KDExp_MKDE, 16},
-    {"_KDExp_UKDE", (DL_FUNC) &_KDExp_UKDE, 16},
+    {"_KDExp_MKDE", (DL_FUNC) &_KDExp_MKDE, 17},
+    {"_KDExp_UKDE", (DL_FUNC) &_KDExp_UKDE, 17},
     {"_KDExp_delta_update", (DL_FUNC) &_KDExp_delta_update, 8},
     {"_KDExp_neg_two_loglike_update", (DL_FUNC) &_KDExp_neg_two_loglike_update, 10},
     {"_KDExp_r_update", (DL_FUNC) &_KDExp_r_update, 9},
     {"_KDExp_rcpp_pgdraw", (DL_FUNC) &_KDExp_rcpp_pgdraw, 2},
     {"_KDExp_sigma2_epsilon_update", (DL_FUNC) &_KDExp_sigma2_epsilon_update, 8},
-    {"_KDExp_w_update", (DL_FUNC) &_KDExp_w_update, 9},
+    {"_KDExp_w_update", (DL_FUNC) &_KDExp_w_update, 10},
     {"_KDExp_z_MKDE_update", (DL_FUNC) &_KDExp_z_MKDE_update, 10},
     {"_KDExp_z_UKDE_update", (DL_FUNC) &_KDExp_z_UKDE_update, 10},
     {NULL, NULL, 0}

@@ -13,6 +13,7 @@ Rcpp::List MKDE(int mcmc_samples,
                 arma::mat H,
                 int likelihood_indicator,
                 Rcpp::Nullable<Rcpp::NumericVector> offset = R_NilValue,
+                Rcpp::Nullable<Rcpp::NumericVector> trials = R_NilValue,
                 Rcpp::Nullable<double> a_r_prior = R_NilValue,
                 Rcpp::Nullable<double> b_r_prior = R_NilValue,
                 Rcpp::Nullable<double> a_sigma2_epsilon_prior = R_NilValue,
@@ -39,6 +40,11 @@ arma::vec neg_two_loglike(mcmc_samples); neg_two_loglike.fill(0.00);
 arma::vec off_set(n); off_set.fill(0.00);
 if(offset.isNotNull()){
   off_set = Rcpp::as<arma::vec>(offset);
+  }
+
+arma::vec tri_als(n); tri_als.fill(1);
+if(trials.isNotNull()){
+  tri_als = Rcpp::as<arma::vec>(trials);
   }
 
 //Prior Information
@@ -109,6 +115,7 @@ if(likelihood_indicator == 2){
   Rcpp::List w_output = w_update(y,
                                  x,
                                  off_set,
+                                 tri_als,
                                  likelihood_indicator,
                                  n,
                                  r(0),
@@ -143,6 +150,7 @@ for(int j = 1; j < mcmc_samples; ++j){
      Rcpp::List w_output = w_update(y,
                                     x,
                                     off_set,
+                                    tri_als,
                                     likelihood_indicator,
                                     n,
                                     r(j-1),
@@ -196,6 +204,7 @@ for(int j = 1; j < mcmc_samples; ++j){
      Rcpp::List w_output = w_update(y,
                                     x,
                                     off_set,
+                                    tri_als,
                                     likelihood_indicator,
                                     n,
                                     r(j),
