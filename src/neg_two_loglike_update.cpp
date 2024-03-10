@@ -9,6 +9,7 @@ using namespace Rcpp;
 double neg_two_loglike_update(arma::vec y,
                               arma::mat x,
                               arma::vec off_set,
+                              arma::vec tri_als,
                               int likelihood_indicator,
                               int n,
                               int r,
@@ -17,8 +18,8 @@ double neg_two_loglike_update(arma::vec y,
                               double theta,
                               arma::vec z){
 
-double dens = 0.00;
-
+arma::vec dens(n); dens.fill(0.00);
+  
 arma::vec mu = off_set +
                x*beta + 
                z*theta;
@@ -27,31 +28,39 @@ arma::vec prob(n); prob.fill(0.00);
 
 if(likelihood_indicator == 0){
   
-  prob = 1.00/(1.00 + exp(-mu));
-  dens = sum(y%log(prob) +
-             (1.00 - y)%log(1.00 - prob));
-    
-  }
-
-if(likelihood_indicator == 1){
-  dens = -0.50*n*log(2*datum::pi*sigma2_epsilon) -
-          0.50*dot((y - mu), (y - mu))/sigma2_epsilon;
-  }
-
-if(likelihood_indicator == 2){
+  arma::vec probs = exp(mu)/(1.00 + exp(mu));
   
-  prob = 1.00/(1.00 + exp(-mu));
-  for(int j = 0; j < n; ++j){
-     dens = dens + 
-            R::dnbinom(y(j), 
-                       r, 
-                       (1.00 - prob(j)),        
-                       TRUE);
+  for(int j = 0; j < n; ++ j){
+     dens(j) = R::dbinom(y(j),
+                         tri_als(j),
+                         probs(j),
+                         TRUE);
      }
   
   }
 
-double neg_two_loglike = -2.00*dens;
+if(likelihood_indicator == 1){
+  for(int j = 0; j < n; ++j){
+     dens(j) = R::dnorm(y(j),
+                        mu(j),
+                        sqrt(sigma2_epsilon),
+                        TRUE);
+     }
+  }
+
+if(likelihood_indicator == 2){
+  
+  arma::vec probs = exp(mu)/(1.00 + exp(mu));
+  for(int j = 0; j < n; ++j){
+     dens(j) = R::dnbinom(y(j), 
+                          r, 
+                          (1.00 - probs(j)),        
+                          TRUE);
+     }
+  
+  }
+
+double neg_two_loglike = -2.00*sum(dens);
 
 return neg_two_loglike;
 

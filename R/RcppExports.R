@@ -13,8 +13,8 @@ delta_update <- function(x, off_set, n, p_x, sigma2_regress, w, gamma, z_old) {
     .Call(`_KDExp_delta_update`, x, off_set, n, p_x, sigma2_regress, w, gamma, z_old)
 }
 
-neg_two_loglike_update <- function(y, x, off_set, likelihood_indicator, n, r, sigma2_epsilon, beta, theta, z) {
-    .Call(`_KDExp_neg_two_loglike_update`, y, x, off_set, likelihood_indicator, n, r, sigma2_epsilon, beta, theta, z)
+neg_two_loglike_update <- function(y, x, off_set, tri_als, likelihood_indicator, n, r, sigma2_epsilon, beta, theta, z) {
+    .Call(`_KDExp_neg_two_loglike_update`, y, x, off_set, tri_als, likelihood_indicator, n, r, sigma2_epsilon, beta, theta, z)
 }
 
 r_update <- function(y, x, off_set, n, a_r, b_r, beta_old, theta_old, z_old) {

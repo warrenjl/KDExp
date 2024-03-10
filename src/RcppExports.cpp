@@ -84,14 +84,15 @@ BEGIN_RCPP
 END_RCPP
 }
 // neg_two_loglike_update
-double neg_two_loglike_update(arma::vec y, arma::mat x, arma::vec off_set, int likelihood_indicator, int n, int r, double sigma2_epsilon, arma::vec beta, double theta, arma::vec z);
-RcppExport SEXP _KDExp_neg_two_loglike_update(SEXP ySEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP likelihood_indicatorSEXP, SEXP nSEXP, SEXP rSEXP, SEXP sigma2_epsilonSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP zSEXP) {
+double neg_two_loglike_update(arma::vec y, arma::mat x, arma::vec off_set, arma::vec tri_als, int likelihood_indicator, int n, int r, double sigma2_epsilon, arma::vec beta, double theta, arma::vec z);
+RcppExport SEXP _KDExp_neg_two_loglike_update(SEXP ySEXP, SEXP xSEXP, SEXP off_setSEXP, SEXP tri_alsSEXP, SEXP likelihood_indicatorSEXP, SEXP nSEXP, SEXP rSEXP, SEXP sigma2_epsilonSEXP, SEXP betaSEXP, SEXP thetaSEXP, SEXP zSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< arma::vec >::type y(ySEXP);
     Rcpp::traits::input_parameter< arma::mat >::type x(xSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type off_set(off_setSEXP);
+    Rcpp::traits::input_parameter< arma::vec >::type tri_als(tri_alsSEXP);
     Rcpp::traits::input_parameter< int >::type likelihood_indicator(likelihood_indicatorSEXP);
     Rcpp::traits::input_parameter< int >::type n(nSEXP);
     Rcpp::traits::input_parameter< int >::type r(rSEXP);
@@ -99,7 +100,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< arma::vec >::type beta(betaSEXP);
     Rcpp::traits::input_parameter< double >::type theta(thetaSEXP);
     Rcpp::traits::input_parameter< arma::vec >::type z(zSEXP);
-    rcpp_result_gen = Rcpp::wrap(neg_two_loglike_update(y, x, off_set, likelihood_indicator, n, r, sigma2_epsilon, beta, theta, z));
+    rcpp_result_gen = Rcpp::wrap(neg_two_loglike_update(y, x, off_set, tri_als, likelihood_indicator, n, r, sigma2_epsilon, beta, theta, z));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -217,7 +218,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_KDExp_MKDE", (DL_FUNC) &_KDExp_MKDE, 17},
     {"_KDExp_UKDE", (DL_FUNC) &_KDExp_UKDE, 17},
     {"_KDExp_delta_update", (DL_FUNC) &_KDExp_delta_update, 8},
-    {"_KDExp_neg_two_loglike_update", (DL_FUNC) &_KDExp_neg_two_loglike_update, 10},
+    {"_KDExp_neg_two_loglike_update", (DL_FUNC) &_KDExp_neg_two_loglike_update, 11},
     {"_KDExp_r_update", (DL_FUNC) &_KDExp_r_update, 9},
     {"_KDExp_rcpp_pgdraw", (DL_FUNC) &_KDExp_rcpp_pgdraw, 2},
     {"_KDExp_sigma2_epsilon_update", (DL_FUNC) &_KDExp_sigma2_epsilon_update, 8},
